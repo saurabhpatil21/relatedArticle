@@ -1,3 +1,4 @@
 services:
-   related_article:
+  related_article:
     class: Drupal\related_article_block\Services\RelatedArticleService
+    arguments: []
