@@ -1,0 +1,6 @@
+name: Related Article Block
+type: module
+description: Defines a custom block to show related Articles.
+core: 8.x
+dependencies:
+  - block
