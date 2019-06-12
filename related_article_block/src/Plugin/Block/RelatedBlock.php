@@ -2,12 +2,12 @@
 
 namespace Drupal\related_article_block\Plugin\Block;
 
+use Drupal\node\NodeInterface;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Block\BlockBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Session\AccountInterface;
-use Drupal\related_article_block\Services\RelatedArticleService;
-use \Drupal\node\Entity\Node;
+
 /**
  * Provides a block with a simple text.
  *
@@ -17,25 +17,26 @@ use \Drupal\node\Entity\Node;
  * )
  */
 class RelatedBlock extends BlockBase {
+
   /**
    * {@inheritdoc}
    */
   public function build() {
 
-    $RelatedServiceObj = \Drupal::service('related_article');
+    $relatedServiceObj = \Drupal::service('related_article');
     $node = \Drupal::routeMatch()->getParameter('node');
-    if ($node instanceof \Drupal\node\NodeInterface) {
+    if ($node instanceof NodeInterface) {
       // You can get nid and anything else you need from the node object.
       $tid = $node->field_tags->target_id;
       $nid = $node->id();
-
+      $aid = $node->getOwner()->id();
     }
-    $nodes = $RelatedServiceObj->getRelatedArticle($nid,$tid);
+    $nodes = $relatedServiceObj->getRelatedArticle($nid, $tid, $aid);
     $html = "<ul>";
     foreach ($nodes as $node_content) {
-      $html .= "<li><a href='/node/". $node_content->id() ."'>". $node_content->getTitle() ."</a></li>";;
+      $html .= "<li><a href='/node/" . $node_content->id() . "'>" . $node_content->getTitle() . "</a></li>";;
     }
-    $html .="</ul>";
+    $html .= "</ul>";
     return [
       '#markup' => $html,
     ];
@@ -64,7 +65,11 @@ class RelatedBlock extends BlockBase {
     $this->configuration['related_block_settings'] = $form_state->getValue('related_block_settings');
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function getCacheMaxAge() {
     return 0;
   }
+
 }
